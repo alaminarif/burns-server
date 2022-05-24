@@ -17,6 +17,7 @@ async function run() {
     await client.connect();
     const purchaseCollection = client.db("burns").collection("purchase");
     const reviewCollection = client.db("burns").collection("review");
+    const oderCollection = client.db("burns").collection("oder");
     // Purchase
     app.get("/purchase", async (req, res) => {
       const query = {};
@@ -30,6 +31,12 @@ async function run() {
       const query = { _id: ObjectId(id) };
       const purchase = await purchaseCollection.findOne(query);
       res.send(purchase);
+    });
+    // place oder
+    app.post("/oder", async (req, res) => {
+      const item = req.body;
+      const result = oderCollection.insertOne(item);
+      res.send(result);
     });
     // Review
     app.get("/review", async (req, res) => {
