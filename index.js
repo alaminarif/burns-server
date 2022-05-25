@@ -18,6 +18,7 @@ async function run() {
     const purchaseCollection = client.db("burns").collection("purchase");
     const reviewCollection = client.db("burns").collection("review");
     const oderCollection = client.db("burns").collection("oder");
+    const usersCollection = client.db("burns").collection("users");
     // Purchase
     app.get("/purchase", async (req, res) => {
       const query = {};
@@ -49,6 +50,18 @@ async function run() {
     app.post("/myreview", async (req, res) => {
       const item = req.body;
       const result = await reviewCollection.insertOne(item);
+      res.send(result);
+    });
+    // users
+    app.put("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: user,
+      };
+      const result = await usersCollection.updateOne(filter, options, updateDoc);
       res.send(result);
     });
   } finally {
