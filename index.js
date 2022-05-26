@@ -64,9 +64,8 @@ async function run() {
     app.delete("/purchase/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-      const result = await purchase
-      .0Collection.deleteOne(query);
-      r    es.send(result);
+      const result = await purchaseCollection.deleteOne(query);
+      res.send(result);
     });
     // place oder
     app.post("/oder", async (req, res) => {
@@ -89,6 +88,21 @@ async function run() {
       const oder = await oderCollection.find(query).toArray();
       res.send(oder);
     });
+
+    /**
+ app.get('/booking', verifyJWT, async (req, res) => {
+      const patient = req.query.patient;
+      const decodedEmail = req.decoded.email;
+      if (patient === decodedEmail) {
+        const query = { patient: patient };
+        const bookings = await bookingCollection.find(query).toArray();
+        return res.send(bookings);
+      }
+      else {
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+    });
+ */
 
     // oder delete
     app.delete("/oder/:id", async (req, res) => {
@@ -136,7 +150,7 @@ async function run() {
     // addmin
     app.get("/admin/:email", async (req, res) => {
       const email = req.params.email;
-      const user = await userCollection.findOne({ email: email });
+      const user = await usersCollection.findOne({ email: email });
       const isAdmin = user.role === "admin";
       res.send({ admin: isAdmin });
     });
@@ -144,13 +158,13 @@ async function run() {
     app.put("/user/admin/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
       const requester = req.decoded.email;
-      const requesterAccount = await userCollection.findOne({ email: requester });
+      const requesterAccount = await usersCollection.findOne({ email: requester });
       if (requesterAccount.role === "admin") {
         const filter = { email: email };
         const updateDoc = {
           $set: { role: "admin" },
         };
-        const result = await userCollection.updateOne(filter, updateDoc);
+        const result = await usersCollection.updateOne(filter, updateDoc);
         res.send(result);
       } else {
         res.status(403).send({ message: "forbidden" });
