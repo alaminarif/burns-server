@@ -127,13 +127,13 @@ async function run() {
     });
 
     // all user load
-    app.get("/user", verifyJWT, async (req, res) => {
+    app.get("/user", async (req, res) => {
       const query = {};
       const user = await usersCollection.find(query).toArray();
       res.send(user);
     });
 
-    // users
+    // users update
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
       const user = req.body;
@@ -147,6 +147,14 @@ async function run() {
       res.send({ result, token });
     });
 
+    // user delete
+    app.delete("/user/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await usersCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // addmin
     app.get("/admin/:email", async (req, res) => {
       const email = req.params.email;
@@ -155,6 +163,7 @@ async function run() {
       res.send({ admin: isAdmin });
     });
 
+    //  make admin
     app.put("/user/admin/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
       const requester = req.decoded.email;
