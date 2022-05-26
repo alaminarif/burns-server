@@ -36,13 +36,15 @@ async function run() {
     const reviewCollection = client.db("burns").collection("review");
     const oderCollection = client.db("burns").collection("oder");
     const usersCollection = client.db("burns").collection("users");
-    // Purchase
+
+    // Purchase load
     app.get("/purchase", async (req, res) => {
       const query = {};
       const cursor = purchaseCollection.find(query);
       const purchase = await cursor.toArray();
       res.send(purchase);
     });
+
     // purchase Details
     app.get("/purchase/:id", async (req, res) => {
       const id = req.params.id;
@@ -50,10 +52,49 @@ async function run() {
       const purchase = await purchaseCollection.findOne(query);
       res.send(purchase);
     });
+
+    // Purchase add
+    app.post("/purchase", async (req, res) => {
+      const item = req.body;
+      const result = purchaseCollection.insertOne(item);
+      res.send(result);
+    });
+
+    // purchase delete
+    app.delete("/purchase/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await purchase
+      .0Collection.deleteOne(query);
+      r    es.send(result);
+    });
     // place oder
     app.post("/oder", async (req, res) => {
       const item = req.body;
       const result = oderCollection.insertOne(item);
+      res.send(result);
+    });
+
+    //oder manage
+    // app.get("/oder", async (req, res) => {
+    //   const query = {};
+    //   const oder = await oderCollection.find(query).toArray();
+    //   res.send(oder);
+    // });
+
+    // oder load
+    app.get("/oder", async (req, res) => {
+      const email = req.query.email;
+      const query = { email };
+      const oder = await oderCollection.find(query).toArray();
+      res.send(oder);
+    });
+
+    // oder delete
+    app.delete("/oder/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await oderCollection.deleteOne(query);
       res.send(result);
     });
     // Review
@@ -63,20 +104,22 @@ async function run() {
       const review = await cursor.toArray();
       res.send(review);
     });
+
     // Add Review
     app.post("/myreview", async (req, res) => {
       const item = req.body;
       const result = await reviewCollection.insertOne(item);
       res.send(result);
     });
+
     // all user load
     app.get("/user", verifyJWT, async (req, res) => {
       const query = {};
       const user = await usersCollection.find(query).toArray();
       res.send(user);
     });
-    // users
 
+    // users
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
       const user = req.body;
@@ -89,6 +132,7 @@ async function run() {
       const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
       res.send({ result, token });
     });
+
     // addmin
     app.get("/admin/:email", async (req, res) => {
       const email = req.params.email;
