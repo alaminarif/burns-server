@@ -67,19 +67,13 @@ async function run() {
       const result = await purchaseCollection.deleteOne(query);
       res.send(result);
     });
-    // place oder
-    app.post("/oder", async (req, res) => {
-      const item = req.body;
-      const result = oderCollection.insertOne(item);
-      res.send(result);
-    });
 
-    //oder manage
-    // app.get("/oder", async (req, res) => {
-    //   const query = {};
-    //   const oder = await oderCollection.find(query).toArray();
-    //   res.send(oder);
-    // });
+    // all oder load
+    app.get("/alloder", async (req, res) => {
+      const query = {};
+      const oder = await oderCollection.find(query).toArray();
+      res.send(oder);
+    });
 
     // oder load
     app.get("/oder", async (req, res) => {
@@ -89,20 +83,12 @@ async function run() {
       res.send(oder);
     });
 
-    /**
- app.get('/booking', verifyJWT, async (req, res) => {
-      const patient = req.query.patient;
-      const decodedEmail = req.decoded.email;
-      if (patient === decodedEmail) {
-        const query = { patient: patient };
-        const bookings = await bookingCollection.find(query).toArray();
-        return res.send(bookings);
-      }
-      else {
-        return res.status(403).send({ message: 'forbidden access' });
-      }
+    // place oder
+    app.post("/oder", async (req, res) => {
+      const item = req.body;
+      const result = oderCollection.insertOne(item);
+      res.send(result);
     });
- */
 
     // oder delete
     app.delete("/oder/:id", async (req, res) => {
@@ -111,7 +97,8 @@ async function run() {
       const result = await oderCollection.deleteOne(query);
       res.send(result);
     });
-    // Review
+
+    // Review load
     app.get("/review", async (req, res) => {
       const query = {};
       const cursor = reviewCollection.find(query);
@@ -127,7 +114,7 @@ async function run() {
     });
 
     // all user load
-    app.get("/user", async (req, res) => {
+    app.get("/user", verifyJWT, async (req, res) => {
       const query = {};
       const user = await usersCollection.find(query).toArray();
       res.send(user);
@@ -143,7 +130,7 @@ async function run() {
         $set: user,
       };
       const result = await usersCollection.updateOne(filter, updateDoc, options);
-      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "24h" });
       res.send({ result, token });
     });
 
@@ -155,6 +142,18 @@ async function run() {
       res.send(result);
     });
 
+    // my profile
+    app.put("myprofile/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: user,
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
     // addmin
     app.get("/admin/:email", async (req, res) => {
       const email = req.params.email;
