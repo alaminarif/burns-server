@@ -129,6 +129,7 @@ async function run() {
       const updateDoc = {
         $set: user,
       };
+
       const result = await usersCollection.updateOne(filter, updateDoc, options);
       const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "24h" });
       res.send({ result, token });
@@ -143,17 +144,26 @@ async function run() {
     });
 
     // my profile
-    app.put("myprofile/:email", async (req, res) => {
+    app.get("/myprofile", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const result = await usersCollection.find(query).toArray();
+      res.send(result);
+    });
+    app.put("/myprofile", async (req, res) => {
       const email = req.params.email;
       const user = req.body;
-      const filter = { email };
+      console.log(user);
+      const filter = { email: email };
       const options = { upsert: true };
       const updateDoc = {
         $set: user,
       };
+
       const result = await usersCollection.updateOne(filter, updateDoc, options);
       res.send(result);
     });
+
     // addmin
     app.get("/admin/:email", async (req, res) => {
       const email = req.params.email;
@@ -167,11 +177,13 @@ async function run() {
       const email = req.params.email;
       const requester = req.decoded.email;
       const requesterAccount = await usersCollection.findOne({ email: requester });
+
       if (requesterAccount.role === "admin") {
         const filter = { email: email };
         const updateDoc = {
           $set: { role: "admin" },
         };
+
         const result = await usersCollection.updateOne(filter, updateDoc);
         res.send(result);
       } else {
