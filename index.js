@@ -144,20 +144,24 @@ async function run() {
     });
 
     // my profile
-    app.get("/myprofile", async (req, res) => {
+    app.get("/myprofile/:email", async (req, res) => {
       const email = req.params.email;
-      const query = { email };
+      const query = { email: email };
       const result = await usersCollection.find(query).toArray();
       res.send(result);
     });
-    app.put("/myprofile", async (req, res) => {
+    app.put("/update-profile/:email", async (req, res) => {
       const email = req.params.email;
       const user = req.body;
       console.log(user);
       const filter = { email: email };
       const options = { upsert: true };
       const updateDoc = {
-        $set: user,
+        $set: {
+          number: user.number,
+          address: user.address,
+          education: user.education,
+        },
       };
 
       const result = await usersCollection.updateOne(filter, updateDoc, options);
