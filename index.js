@@ -36,6 +36,28 @@ async function run() {
     const reviewCollection = client.db("burns").collection("review");
     const oderCollection = client.db("burns").collection("oder");
     const usersCollection = client.db("burns").collection("users");
+    const categoriesCollection = client.db("burns").collection("categories");
+    // const subCategoriesCollection = client.db("burns").collection("subCategories");
+
+    // categories
+    app.get("/categories", async (req, res) => {
+      const categories = await categoriesCollection.find({}).toArray();
+      res.send(categories);
+    });
+
+    // categori
+    app.get("/categories/:id", async (req, res) => {
+      const { id } = req.params;
+      const result = await categoriesCollection.findOne({ _id: ObjectId(id) });
+      res.send(result);
+    });
+
+    //sub category
+    // app.get("sub-categories:id", async (req, res) => {
+    //   const { id } = req.params;
+    //   const result = await subCategoriesCollection.findOne({ _id: ObjectId(id) });
+    //   res.send(result);
+    // });
 
     // Purchase load
     app.get("/purchase", async (req, res) => {
